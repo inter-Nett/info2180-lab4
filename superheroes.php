@@ -63,10 +63,48 @@ $superheroes = [
   ], 
 ];
 
-?>
+// Get the search query from the URL
+$query = isset($_GET['query']) ? trim($_GET['query']) : '';
 
-<ul>
-<?php foreach ($superheroes as $superhero): ?>
-  <li><?= $superhero['alias']; ?></li>
-<?php endforeach; ?>
-</ul>
+// Function to safely display text
+function escapeHTML($text) {
+    return htmlspecialchars($text, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+}
+
+// If the search field is empty, display all superheroes
+if ($query === '') {
+
+    echo "<ul>";
+
+    foreach ($superheroes as $superhero) {
+        echo "<li>" . escapeHTML($superhero['alias']) . "</li>";
+    }
+
+    echo "</ul>";
+
+} else {
+
+    // Search for a superhero by name or alias
+    $found = false;
+
+    foreach ($superheroes as $superhero) {
+
+        if (
+            strcasecmp($superhero['name'], $query) === 0 ||
+            strcasecmp($superhero['alias'], $query) === 0
+        ) {
+
+            echo "<h3>" . escapeHTML($superhero['alias']) . "</h3>";
+            echo "<h4> A.K.A " . escapeHTML($superhero['name']) . "</h4>";
+            echo "<p>" . escapeHTML($superhero['biography']) . "</p>";
+
+            $found = true;
+            break;
+        }
+    }
+
+    // Display a message if no superhero matches
+    if (!$found) {
+        echo "<p class='not-found'>Superhero not found</p>";
+    }
+}
